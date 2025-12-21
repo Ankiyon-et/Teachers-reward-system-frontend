@@ -16,8 +16,8 @@
     <!-- Logo -->
     <div :class="['py-8 flex', !isExpanded && !isHovered ? 'lg:justify-center' : 'justify-start']">
       <router-link to="/">
-        <img v-if="isExpanded || isHovered || isMobileOpen" class="dark:hidden" src="/images/logo/logo.svg" alt="Logo" width="150" height="40" />
-        <img v-if="isExpanded || isHovered || isMobileOpen" class="hidden dark:block" src="/images/logo/logo-dark.svg" alt="Logo" width="150" height="40" />
+        <img v-if="isExpanded || isHovered || isMobileOpen" class="dark:hidden" src="/images/logo/logo.png" alt="Logo" width="150" height="40" />
+        <img v-if="isExpanded || isHovered || isMobileOpen" class="hidden dark:block" src="/images/logo/logo-dark.png" alt="Logo" width="150" height="40" />
         <img v-else src="/images/logo/logo-icon.svg" alt="Logo" width="32" height="32" />
       </router-link>
     </div>
@@ -90,7 +90,6 @@ const allMenuGroups = [
     title: "Menu",
     items: [
       { icon: GridIcon, name: "Dashboard", subItems: [{ name: "Ecommerce", path: "/", pro: false }] },
-      { icon: CalenderIcon, name: "Calendar", path: "/calendar" },
       { icon: UserCircleIcon, name: "User Profile", path: "/profile" },
     ],
   },
@@ -106,7 +105,6 @@ const allMenuGroups = [
           { name: "Dashboard", path: "/super-admin/dashboard", pro: false },
           { name: "Schools", path: "/super-admin/schools", pro: false },
           { name: "Super Admins", path: "/super-admin/super-admins", pro: false },
-          { name: "Profile", path: "/super-admin/profile", pro: false }
         ]
       },
       // School Admin
@@ -118,7 +116,6 @@ const allMenuGroups = [
           { name: "Dashboard", path: "/school-admin/dashboard", pro: false },
           { name: "Teachers", path: "/school-admin/teachers", pro: false },
           { name: "Grades", path: "/school-admin/grades", pro: false },
-          { name: "Profile", path: "/school-admin/profile", pro: false }
         ]
       },
       // Teacher
@@ -130,7 +127,6 @@ const allMenuGroups = [
           { name: "Dashboard", path: "/teacher/dashboard", pro: false },
           { name: "My Classes", path: "/teacher/classes", pro: false },
           { name: "Assignments", path: "/teacher/assignments", pro: false },
-          { name: "Profile", path: "/teacher/profile", pro: false },
         ]
       }
     ]

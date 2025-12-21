@@ -56,11 +56,6 @@ const router = createRouter({
       meta: { role: 1, title: 'Super Admins' },
     },
     {
-      path: '/super-admin/profile',
-      component: () => import('../views/super-admin/Profile.vue'),
-      meta: { role: 1, title: 'Profile' },
-    },
-    {
       path: '/super-admin/schools/:id',
       name: 'SuperAdminSchoolDetail',
       component: () => import('../views/super-admin/SchoolDetail.vue'),
@@ -84,16 +79,6 @@ const router = createRouter({
       path: '/school-admin/grades',
       component: () => import('../views/school-admin/Grades.vue'),
       meta: { role: 2, title: 'Grades' },
-    },
-    {
-      path: '/school-admin/reports',
-      component: () => import('../views/school-admin/Reports.vue'),
-      meta: { role: 2, title: 'Reports' },
-    },
-    {
-      path: '/school-admin/profile',
-      component: () => import('../views/school-admin/Profile.vue'),
-      meta: { role: 2, title: 'Profile' },
     },
 
     // --------------------
@@ -119,11 +104,7 @@ const router = createRouter({
       component: () => import('../views/teacher/Withdrawals.vue'),
       meta: { role: 3, title: 'Withdrawals' },
     },
-    {
-      path: '/teacher/profile',
-      component: () => import('../views/teacher/Profile.vue'),
-      meta: { role: 3, title: 'Profile' },
-    },
+
 
     // --------------------
     // Errors
