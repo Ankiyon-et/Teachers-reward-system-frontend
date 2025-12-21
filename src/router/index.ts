@@ -14,13 +14,11 @@ const router = createRouter({
     // --------------------
     {
       path: '/',
-      name: 'Ecommerce',
-      component: () => import('../views/Ecommerce.vue'),
-      meta: { title: 'eCommerce Dashboard' },
+      redirect: '/signin',
     },
     {
       path: '/calendar',
-      component: () => import('../views/Others/Calendar.vue'),
+      component: () => import('../views/Tables/BasicTables.vue'),
       meta: { title: 'Calendar' },
     },
     {
@@ -62,6 +60,12 @@ const router = createRouter({
       component: () => import('../views/super-admin/Profile.vue'),
       meta: { role: 1, title: 'Profile' },
     },
+    {
+      path: '/super-admin/schools/:id',
+      name: 'SuperAdminSchoolDetail',
+      component: () => import('../views/super-admin/SchoolDetail.vue'),
+    },
+
 
     // --------------------
     // School Admin (role = 2)

@@ -20,10 +20,6 @@
         <top-performing-schools :schools="topPerformingSchools" />
       </div>
 
-      <!-- Teacher Population Per School -->
-      <div class="col-span-12">
-        <teacher-population-per-school :schools="teachersPopulationPerSchool" />
-      </div>
     </div>
   </admin-layout>
 </template>
@@ -33,7 +29,6 @@ import AdminLayout from '@/components/layout/AdminLayout.vue'
 import SuperAdminMetrics from '@/components/super-admin/SuperAdminMetrics.vue'
 import MonthlyRewardTrend from '@/components/super-admin/MonthlyRewardTrend.vue'
 import TopPerformingSchools from '@/components/super-admin/TopPerformingSchools.vue'
-import TeacherPopulationPerSchool from '@/components/super-admin/TeacherPopulationPerSchool.vue'
 import { onMounted } from 'vue'
 import { useDashboard } from '@/composables/useDashboard'
 
@@ -45,7 +40,6 @@ const {
   totalRewardsProcessed,
   monthlyRewardTrend,
   topPerformingSchools,
-  teachersPopulationPerSchool,
   fetchDashboard,
 } = useDashboard()
 

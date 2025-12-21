@@ -4,7 +4,6 @@ import { getSuperAdminDashboard } from '@/services/dashboard'
 import type {
   MonthlyRewardTrend,
   TopPerformingSchool,
-  TeacherPopulationPerSchool
 } from '@/services/dashboard'
 
 const totalSchools = ref<number>(0)
@@ -13,7 +12,7 @@ const totalRewardsProcessed = ref<number>(0)
 
 const monthlyRewardTrend = ref<MonthlyRewardTrend[]>([])
 const topPerformingSchools = ref<TopPerformingSchool[]>([])
-const teachersPopulationPerSchool = ref<TeacherPopulationPerSchool[]>([])
+
 
 const loading = ref(false)
 const error = ref<string | null>(null)
@@ -34,7 +33,6 @@ export function useDashboard() {
       // charts
       monthlyRewardTrend.value = data.monthly_reward_trend
       topPerformingSchools.value = data.top_performing_schools
-      teachersPopulationPerSchool.value = data.teachers_population_per_school
     } catch (e: any) {
       error.value = e?.message ?? 'Failed to load dashboard'
     } finally {
@@ -51,7 +49,6 @@ export function useDashboard() {
     // charts
     monthlyRewardTrend,
     topPerformingSchools,
-    teachersPopulationPerSchool,
 
     // state
     loading,
