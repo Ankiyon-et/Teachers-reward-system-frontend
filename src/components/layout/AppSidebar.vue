@@ -89,7 +89,6 @@ const allMenuGroups = [
   {
     title: "Menu",
     items: [
-      { icon: GridIcon, name: "Dashboard", subItems: [{ name: "Ecommerce", path: "/", pro: false }] },
       { icon: UserCircleIcon, name: "User Profile", path: "/profile" },
     ],
   },
