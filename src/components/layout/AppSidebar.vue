@@ -104,6 +104,7 @@ const allMenuGroups = [
           { name: "Dashboard", path: "/super-admin/dashboard", pro: false },
           { name: "Schools", path: "/super-admin/schools", pro: false },
           { name: "Super Admins", path: "/super-admin/super-admins", pro: false },
+          { name: "Grades", path: "/super-admin/grades", pro: false },
         ]
       },
       // School Admin

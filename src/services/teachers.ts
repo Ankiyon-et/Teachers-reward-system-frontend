@@ -30,3 +30,14 @@ export async function deleteTeacher(id: number) {
   const res = await api.delete(`/delete/teachers/${id}`);
   return res.data;
 }
+
+export async function assignGradesToTeacher(
+  teacherId: number,
+  gradeIds: number[]
+) {
+  const res = await api.post(
+    `/teachers/${teacherId}/assign-grades`,
+    { grade_ids: gradeIds }
+  );
+  return res.data;
+}

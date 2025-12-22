@@ -37,61 +37,49 @@
           <table class="min-w-full">
             <thead>
               <tr class="border-b border-gray-200 dark:border-gray-700">
-                <th class="px-5 py-3 text-left text-gray-600 dark:text-gray-400">
-                  Name
-                </th>
-                <th class="px-5 py-3 text-left text-gray-600 dark:text-gray-400">
-                  Email
-                </th>
-                <th class="px-5 py-3 text-left text-gray-600 dark:text-gray-400">
-                  Subject
-                </th>
-                <th class="px-5 py-3 text-left text-gray-600 dark:text-gray-400">
-                  Actions
-                </th>
+                <th class="px-5 py-3 text-left">Name</th>
+                <th class="px-5 py-3 text-left">Email</th>
+                <th class="px-5 py-3 text-left">Subject</th>
+                <th class="px-5 py-3 text-left">Actions</th>
               </tr>
             </thead>
 
             <tbody v-if="visibleTeachers.length">
-  <tr v-for="t in visibleTeachers" :key="t.id"
+              <tr
+                v-for="t in visibleTeachers"
+                :key="t.id"
                 class="border-t border-gray-100 dark:border-gray-800"
               >
-                <td class="px-5 py-4 text-gray-800 dark:text-white">
-                  {{ t.user.name }}
-                </td>
-                <td class="px-5 py-4 text-gray-700 dark:text-gray-300">
-                  {{ t.user.email }}
-                </td>
-                <td class="px-5 py-4 text-gray-700 dark:text-gray-300">
-                  {{ t.subject || "-" }}
-                </td>
+                <td class="px-5 py-4">{{ t.user.name }}</td>
+                <td class="px-5 py-4">{{ t.user.email }}</td>
+                <td class="px-5 py-4">{{ t.subject || "-" }}</td>
                 <td class="px-5 py-4 flex gap-2">
-                  <Button size="sm" variant="outline" @click="openEdit()">
-                    Edit
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="!text-error-600"
+                    @click="openDeleteModal(t)"
+                  >
+                    Delete
                   </Button>
                   <Button
                     size="sm"
                     variant="outline"
-                    className="!text-error-600 dark:!text-error-400"
-                    @click="openDeleteModal(t)"
+                    @click="openAssignGrades(t)"
                   >
-                    Delete
+                    Assign Grades
                   </Button>
                 </td>
               </tr>
             </tbody>
 
             <tbody v-else>
-  <tr>
-    <td
-      colspan="4"
-      class="px-5 py-6 text-center text-gray-500 dark:text-gray-400"
-    >
-      No teachers found.
-    </td>
-  </tr>
-</tbody>
-
+              <tr>
+                <td colspan="4" class="px-5 py-6 text-center text-gray-500">
+                  No teachers found.
+                </td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </ComponentCard>
@@ -99,29 +87,18 @@
       <!-- ADD MODAL -->
       <Modal v-if="showAdd" @close="showAdd = false">
         <template #body>
-          <div class="bg-white dark:bg-gray-900 p-6 rounded-xl w-full max-w-md">
-            <h3 class="font-semibold mb-4 text-gray-800 dark:text-white">
-              Add Teacher
-            </h3>
+          <div class="bg-white dark:bg-gray-900 p-6 rounded-xl max-w-md">
+            <h3 class="font-semibold mb-4">Add Teacher</h3>
 
             <form @submit.prevent="create">
               <input v-model="form.name" class="input" placeholder="Name" />
               <input v-model="form.email" class="input" placeholder="Email" />
-              <input
-                v-model="form.password"
-                type="password"
-                class="input"
-                placeholder="Password"
-              />
+              <input v-model="form.password" type="password" class="input" placeholder="Password" />
               <input v-model="form.subject" class="input" placeholder="Subject" />
 
               <div class="flex justify-end gap-2 mt-4">
-                <Button variant="outline" @click="showAdd = false">
-                  Cancel
-                </Button>
-                <Button variant="primary" type="submit">
-                  Create
-                </Button>
+                <Button variant="outline" @click="showAdd = false">Cancel</Button>
+                <Button variant="primary" type="submit">Create</Button>
               </div>
             </form>
           </div>
@@ -131,14 +108,11 @@
       <!-- DELETE MODAL -->
       <Modal v-if="showDelete" @close="closeDelete">
         <template #body>
-          <div class="w-full max-w-md rounded-xl bg-white p-6 dark:bg-gray-900">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">
-              Confirm Delete
-            </h3>
+          <div class="max-w-md rounded-xl bg-white p-6 dark:bg-gray-900">
+            <h3 class="text-lg font-semibold">Confirm Delete</h3>
 
-            <p class="mt-3 text-gray-600 dark:text-gray-400">
-              Are you sure you want to delete
-              <strong>{{ selectedTeacher?.name }}</strong>?
+            <p class="mt-3 text-gray-600">
+              Delete <strong>{{ selectedTeacher?.user.name }}</strong>?
             </p>
 
             <div class="flex justify-end gap-2 mt-6">
@@ -148,10 +122,43 @@
               <Button
                 variant="primary"
                 size="sm"
-                className="!bg-error-600 hover:!bg-error-700"
+                className="!bg-error-600"
                 @click="confirmDelete"
               >
                 Delete
+              </Button>
+            </div>
+          </div>
+        </template>
+      </Modal>
+
+      <!-- ASSIGN GRADES MODAL -->
+      <Modal v-if="showAssign" @close="closeAssign">
+        <template #body>
+          <div class="max-w-md rounded-xl bg-white p-6 dark:bg-gray-900">
+            <h3 class="text-lg font-semibold">Assign Grades</h3>
+
+            <p class="text-sm text-gray-600">
+              Teacher: <strong>{{ selectedTeacher?.user.name }}</strong>
+            </p>
+
+            <div class="mt-4 space-y-2 max-h-64 overflow-y-auto">
+              <label
+                v-for="g in grades"
+                :key="g.id"
+                class="flex items-center gap-2"
+              >
+                <input type="checkbox" :value="g.id" v-model="selectedGradeIds" />
+                {{ g.name }}
+              </label>
+            </div>
+
+            <div class="flex justify-end gap-2 mt-6">
+              <Button variant="outline" size="sm" @click="closeAssign">
+                Cancel
+              </Button>
+              <Button variant="primary" size="sm" @click="submitAssign">
+                Assign
               </Button>
             </div>
           </div>
@@ -162,17 +169,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import Button from "@/components/ui/Button.vue";
 import Modal from "@/components/ui/Modal.vue";
 import { useTeachers } from "@/composables/useTeachers";
-import { computed } from "vue";
+import { useGrades } from "@/composables/useGrades";
 
-const visibleTeachers = computed(() =>
-  teachers.value.filter(t => t.user && t.user.name && t.user.email)
-);
-
+/* TEACHERS */
 const {
   teachers,
   loading,
@@ -182,14 +186,20 @@ const {
   deleteTeacher,
 } = useTeachers();
 
+/* GRADES */
+const { grades, fetchAllGrades, assignToTeacher } = useGrades();
+
+/* SHARED STATE */
+const selectedTeacher = ref<any | null>(null);
+
+/* FILTER */
+const visibleTeachers = computed(() =>
+  teachers.value.filter(t => t.user?.name && t.user?.email)
+);
+
 /* ADD */
 const showAdd = ref(false);
-const form = ref({
-  name: "",
-  email: "",
-  password: "",
-  subject: "",
-});
+const form = ref({ name: "", email: "", password: "", subject: "" });
 
 async function create() {
   await createTeacher(form.value);
@@ -197,14 +207,8 @@ async function create() {
   form.value = { name: "", email: "", password: "", subject: "" };
 }
 
-/* EDIT (placeholder) */
-function openEdit() {
-  alert("Edit modal coming next.");
-}
-
 /* DELETE */
 const showDelete = ref(false);
-const selectedTeacher = ref<any | null>(null);
 
 function openDeleteModal(t: any) {
   selectedTeacher.value = t;
@@ -218,16 +222,47 @@ function closeDelete() {
 
 async function confirmDelete() {
   if (!selectedTeacher.value) return;
-
-  try {
-    await deleteTeacher(selectedTeacher.value.id);
-    await fetchTeachers(); // 🔥 IMPORTANT
-  } catch (e) {
-    console.error("Delete failed", e);
-  } finally {
-    closeDelete();
-  }
+  await deleteTeacher(selectedTeacher.value.id);
+  await fetchTeachers();
+  closeDelete();
 }
+
+/* ASSIGN */
+const showAssign = ref(false);
+const selectedGradeIds = ref<number[]>([]);
+
+function openAssignGrades(t: any) {
+  selectedTeacher.value = t;
+
+  // ✅ PRE-CHECK already assigned grades
+  selectedGradeIds.value = t.grades
+    ? t.grades.map((g: any) => g.id)
+    : [];
+
+  showAssign.value = true;
+  fetchAllGrades();
+}
+
+
+function closeAssign() {
+  selectedTeacher.value = null;
+  selectedGradeIds.value = [];
+  showAssign.value = false;
+}
+
+async function submitAssign() {
+  if (!selectedTeacher.value) return;
+
+  if (!selectedGradeIds.value.length) {
+    alert("Please select at least one grade.");
+    return;
+  }
+
+  await assignToTeacher(selectedTeacher.value.id, selectedGradeIds.value);
+  closeAssign();
+}
+
+
 
 onMounted(fetchTeachers);
 </script>
@@ -239,13 +274,5 @@ onMounted(fetchTeachers);
   padding: 0.5rem;
   border-radius: 0.375rem;
   margin-bottom: 0.5rem;
-  background-color: white;
-  color: #111827;
-}
-
-:global(.dark) .input {
-  background-color: #111827;
-  border-color: #374151;
-  color: #f9fafb;
 }
 </style>

@@ -60,6 +60,11 @@ const router = createRouter({
       name: 'SuperAdminSchoolDetail',
       component: () => import('../views/super-admin/SchoolDetail.vue'),
     },
+    {
+      path: '/super-admin/grades',
+      component: () => import('../views/super-admin/Grades.vue'),
+      meta: { role: 1, title: 'Grades' },
+    },
 
 
     // --------------------

@@ -16,4 +16,3 @@ export function setUserToken(token: string) {
   localStorage.setItem("token", token);
 }
 
-// || sessionStorage.getItem('role_id')
