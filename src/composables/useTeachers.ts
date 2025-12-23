@@ -1,6 +1,7 @@
+// src/composables/useTeachers.ts
 import { ref } from "vue";
-import type { Teacher, CreateTeacherPayload } from "@/services/teachers";
 import * as teachersAPI from "@/services/teachers";
+import type { Teacher, CreateTeacherPayload } from "@/services/teachers";
 
 export function useTeachers() {
   const teachers = ref<Teacher[]>([]);
@@ -10,14 +11,12 @@ export function useTeachers() {
   async function fetchTeachers() {
     loading.value = true;
     error.value = null;
-
     try {
-      const data = await teachersAPI.getTeachers();
-      teachers.value = data;
+      teachers.value = await teachersAPI.getTeachers();
     } catch (err: any) {
+      console.error("fetchTeachers error", err);
       error.value =
         err?.response?.data?.message || err.message || "Failed to fetch teachers";
-      teachers.value = [];
     } finally {
       loading.value = false;
     }
@@ -26,10 +25,10 @@ export function useTeachers() {
   async function createTeacher(payload: CreateTeacherPayload) {
     loading.value = true;
     error.value = null;
-
     try {
-      await teachersAPI.createTeacher(payload);
-      await fetchTeachers(); // clean refresh
+      const res = await teachersAPI.createTeacher(payload);
+      await fetchTeachers();
+      return res;
     } catch (err: any) {
       error.value =
         err?.response?.data?.message || err.message || "Failed to create teacher";
@@ -39,16 +38,35 @@ export function useTeachers() {
     }
   }
 
-  async function deleteTeacher(id: number) {
+  async function removeTeacher(id: number) {
     loading.value = true;
     error.value = null;
-
     try {
-      await teachersAPI.deleteTeacher(id);
+      const res = await teachersAPI.deleteTeacher(id);
       teachers.value = teachers.value.filter(t => t.id !== id);
+      return res;
     } catch (err: any) {
       error.value =
         err?.response?.data?.message || err.message || "Failed to delete teacher";
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function assignGrades(teacherId: number, gradeIds: number[]) {
+    loading.value = true;
+    error.value = null;
+    try {
+      const res = await teachersAPI.assignGradesToTeacher(
+        teacherId,
+        gradeIds
+      );
+      await fetchTeachers();
+      return res;
+    } catch (err: any) {
+      error.value =
+        err?.response?.data?.message || err.message || "Failed to assign grades";
       throw err;
     } finally {
       loading.value = false;
@@ -61,6 +79,7 @@ export function useTeachers() {
     error,
     fetchTeachers,
     createTeacher,
-    deleteTeacher,
+    removeTeacher,
+    assignGrades,
   };
 }

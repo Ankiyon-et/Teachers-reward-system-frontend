@@ -1,12 +1,20 @@
+// src/services/teachers.ts
 import { api } from "./api";
 
 export type Teacher = {
   id: number;
   subject: string;
+  status: string;
+  hire_date: string;
   user: {
+    id: number;
     name: string;
     email: string;
   };
+  grades: {
+    id: number;
+    name: string;
+  }[];
 };
 
 export type CreateTeacherPayload = {
@@ -33,11 +41,11 @@ export async function deleteTeacher(id: number) {
 
 export async function assignGradesToTeacher(
   teacherId: number,
-  gradeIds: number[]
+  grade_ids: number[]
 ) {
   const res = await api.post(
     `/teachers/${teacherId}/assign-grades`,
-    { grade_ids: gradeIds }
+    { grade_ids }
   );
   return res.data;
 }

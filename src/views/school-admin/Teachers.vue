@@ -1,13 +1,14 @@
 <template>
   <AdminLayout>
     <div class="p-6">
-      <h1 class="text-2xl font-semibold text-gray-800 dark:text-white mb-6">
-        Teachers
-      </h1>
 
-      <!-- ACTIONS -->
-      <div class="flex items-center gap-2 mb-4">
-        <Button variant="primary" size="md" @click="showAdd = true">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-semibold text-gray-800 dark:text-white/90">
+          Teachers
+        </h1>
+
+        <Button variant="primary" size="md" @click="openAddModal">
           + Add Teacher
         </Button>
         <Button variant="outline" size="sm" @click="fetchTeachers">
@@ -15,115 +16,121 @@
         </Button>
       </div>
 
-      <!-- STATES -->
-      <div v-if="loading" class="p-4 text-gray-600 dark:text-gray-400">
-        Loading...
-      </div>
-
-      <div
-        v-if="error"
-        class="p-4 mb-4 rounded bg-red-50 text-red-700
-               dark:bg-red-900/30 dark:text-red-400"
-      >
+      <div v-if="loading" class="p-4">Loading...</div>
+      <div v-if="error" class="p-4 bg-red-50 text-red-700 mb-4">
         {{ error }}
       </div>
 
-      <!-- TABLE -->
+      <!-- Teachers Table -->
       <ComponentCard title="Teachers List">
-        <div
-          class="overflow-hidden rounded-xl border border-gray-200 bg-white
-                 dark:border-gray-800 dark:bg-gray-900"
-        >
-          <table class="min-w-full">
-            <thead>
-              <tr class="border-b border-gray-200 dark:border-gray-700">
-                <th class="px-5 py-3 text-left">Name</th>
-                <th class="px-5 py-3 text-left">Email</th>
-                <th class="px-5 py-3 text-left">Subject</th>
-                <th class="px-5 py-3 text-left">Actions</th>
-              </tr>
-            </thead>
+        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+          <div class="max-w-full overflow-x-auto custom-scrollbar">
+            <table class="min-w-full">
+              <thead>
+                <tr class="border-b border-gray-200 dark:border-gray-700">
+                  <th class="px-5 py-3 text-left">Name</th>
+                  <th class="px-5 py-3 text-left">Email</th>
+                  <th class="px-5 py-3 text-left">Subject</th>
+                  <th class="px-5 py-3 text-left">Grades</th>
+                  <th class="px-5 py-3 text-left">Actions</th>
+                </tr>
+              </thead>
 
-            <tbody v-if="visibleTeachers.length">
-              <tr
-                v-for="t in visibleTeachers"
-                :key="t.id"
-                class="border-t border-gray-100 dark:border-gray-800"
-              >
-                <td class="px-5 py-4">{{ t.user.name }}</td>
-                <td class="px-5 py-4">{{ t.user.email }}</td>
-                <td class="px-5 py-4">{{ t.subject || "-" }}</td>
-                <td class="px-5 py-4 flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="!text-error-600"
-                    @click="openDeleteModal(t)"
-                  >
-                    Delete
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    @click="openAssignGrades(t)"
-                  >
-                    Assign Grades
-                  </Button>
-                </td>
-              </tr>
-            </tbody>
+              <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                <tr v-for="t in teachers" :key="t.id">
+                  <td class="px-5 py-4">{{ t.user.name }}</td>
+                  <td class="px-5 py-4">{{ t.user.email }}</td>
+                  <td class="px-5 py-4">{{ t.subject }}</td>
+                  <td class="px-5 py-4">
+                    <span v-if="t.grades.length">
+                      {{ t.grades.map(g => g.name).join(", ") }}
+                    </span>
+                    <span v-else class="text-gray-400">No grades</span>
+                  </td>
+                  <td class="px-5 py-4 space-x-2">
+                    <Button size="sm" variant="outline" @click="openAssignModal(t)">
+                      Assign Grades
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="!text-error-600 !dark:text-error-500"
+                      @click="confirmDelete(t)"
+                    >
+                      Delete
+                    </Button>
+                  </td>
+                </tr>
 
-            <tbody v-else>
-              <tr>
-                <td colspan="4" class="px-5 py-6 text-center text-gray-500">
-                  No teachers found.
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                <tr v-if="!teachers.length && !loading">
+                  <td colspan="5" class="px-5 py-6 text-center text-gray-500">
+                    No teachers found.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </ComponentCard>
 
-      <!-- ADD MODAL -->
-      <Modal v-if="showAdd" @close="showAdd = false">
+      <!-- Add Teacher Modal -->
+      <Modal v-if="showAdd" fullScreenBackdrop @close="closeAdd">
         <template #body>
-          <div class="bg-white dark:bg-gray-900 p-6 rounded-xl max-w-md">
-            <h3 class="font-semibold mb-4">Add Teacher</h3>
+          <div class="w-full max-w-md bg-white p-6 rounded-xl dark:bg-gray-900">
+            <h3 class="text-lg font-semibold mb-4">Add Teacher</h3>
+            <form @submit.prevent="onCreate">
+              <input v-model="form.name" placeholder="Name" class="input" required />
+              <input v-model="form.email" placeholder="Email" type="email" class="input mt-2" required />
+              <input v-model="form.password" placeholder="Password" type="password" class="input mt-2" required />
+              <input v-model="form.subject" placeholder="Subject" class="input mt-2" required />
 
-            <form @submit.prevent="create">
-              <input v-model="form.name" class="input" placeholder="Name" />
-              <input v-model="form.email" class="input" placeholder="Email" />
-              <input v-model="form.password" type="password" class="input" placeholder="Password" />
-              <input v-model="form.subject" class="input" placeholder="Subject" />
-
-              <div class="flex justify-end gap-2 mt-4">
-                <Button variant="outline" @click="showAdd = false">Cancel</Button>
-                <Button variant="primary" type="submit">Create</Button>
+              <div class="mt-4 flex justify-end gap-2">
+                <Button variant="outline" size="sm" @click="closeAdd">Cancel</Button>
+                <Button variant="primary" size="sm" :disabled="submitting">
+                  {{ submitting ? "Creating…" : "Create" }}
+                </Button>
               </div>
             </form>
           </div>
         </template>
       </Modal>
 
-      <!-- DELETE MODAL -->
-      <Modal v-if="showDelete" @close="closeDelete">
+      <!-- Assign Grades Modal -->
+      <Modal v-if="showAssign" fullScreenBackdrop @close="closeAssign">
         <template #body>
-          <div class="max-w-md rounded-xl bg-white p-6 dark:bg-gray-900">
-            <h3 class="text-lg font-semibold">Confirm Delete</h3>
+          <div class="w-full max-w-md bg-white p-6 rounded-xl dark:bg-gray-900">
+            <h3 class="text-lg font-semibold mb-4">Assign Grades</h3>
 
-            <p class="mt-3 text-gray-600">
-              Delete <strong>{{ selectedTeacher?.user.name }}</strong>?
-            </p>
+            <div v-for="g in grades" :key="g.id" class="flex gap-2">
+              <input type="checkbox" :value="g.id" v-model="selectedGrades" />
+              <span>{{ g.name }}</span>
+            </div>
 
-            <div class="flex justify-end gap-2 mt-6">
-              <Button variant="outline" size="sm" @click="closeDelete">
-                Cancel
+            <div class="mt-4 flex justify-end gap-2">
+              <Button variant="outline" size="sm" @click="closeAssign">Cancel</Button>
+              <Button variant="primary" size="sm" :disabled="submitting" @click="onAssign">
+                Assign
               </Button>
+            </div>
+          </div>
+        </template>
+      </Modal>
+
+      <!-- Delete Confirmation -->
+      <Modal v-if="showDelete" fullScreenBackdrop @close="cancelDelete">
+        <template #body>
+          <div class="w-full max-w-md bg-white p-6 rounded-xl dark:bg-gray-900">
+            <h3 class="text-lg font-semibold mb-3">Confirm Delete</h3>
+            <p>Delete <strong>{{ deleteTarget?.user.name }}</strong>?</p>
+
+            <div class="mt-4 flex justify-end gap-2">
+              <Button variant="outline" size="sm" @click="cancelDelete">Cancel</Button>
               <Button
                 variant="primary"
                 size="sm"
                 className="!bg-error-600"
-                @click="confirmDelete"
+                :disabled="submitting"
+                @click="onDelete"
               >
                 Delete
               </Button>
@@ -132,147 +139,86 @@
         </template>
       </Modal>
 
-      <!-- ASSIGN GRADES MODAL -->
-      <Modal v-if="showAssign" @close="closeAssign">
-        <template #body>
-          <div class="max-w-md rounded-xl bg-white p-6 dark:bg-gray-900">
-            <h3 class="text-lg font-semibold">Assign Grades</h3>
-
-            <p class="text-sm text-gray-600">
-              Teacher: <strong>{{ selectedTeacher?.user.name }}</strong>
-            </p>
-
-            <div class="mt-4 space-y-2 max-h-64 overflow-y-auto">
-              <label
-                v-for="g in grades"
-                :key="g.id"
-                class="flex items-center gap-2"
-              >
-                <input type="checkbox" :value="g.id" v-model="selectedGradeIds" />
-                {{ g.name }}
-              </label>
-            </div>
-
-            <div class="flex justify-end gap-2 mt-6">
-              <Button variant="outline" size="sm" @click="closeAssign">
-                Cancel
-              </Button>
-              <Button variant="primary" size="sm" @click="submitAssign">
-                Assign
-              </Button>
-            </div>
-          </div>
-        </template>
-      </Modal>
     </div>
   </AdminLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import AdminLayout from "@/components/layout/AdminLayout.vue";
 import Button from "@/components/ui/Button.vue";
 import Modal from "@/components/ui/Modal.vue";
 import { useTeachers } from "@/composables/useTeachers";
-import { useGrades } from "@/composables/useGrades";
+import { useSchoolGrades } from "@/composables/useSchoolGrades";
 
-/* TEACHERS */
-const {
-  teachers,
-  loading,
-  error,
-  fetchTeachers,
-  createTeacher,
-  deleteTeacher,
-} = useTeachers();
+const { teachers, loading, error, fetchTeachers, createTeacher, removeTeacher, assignGrades } = useTeachers();
+const { assignedGrades: grades, fetchAssignedGrades } = useSchoolGrades();
 
-/* GRADES */
-const { grades, fetchAllGrades, assignToTeacher } = useGrades();
+onMounted(async () => {
+  await fetchTeachers();
+  await fetchAssignedGrades();
+});
 
-/* SHARED STATE */
-const selectedTeacher = ref<any | null>(null);
-
-/* FILTER */
-const visibleTeachers = computed(() =>
-  teachers.value.filter(t => t.user?.name && t.user?.email)
-);
-
-/* ADD */
+// Add teacher
 const showAdd = ref(false);
+const submitting = ref(false);
 const form = ref({ name: "", email: "", password: "", subject: "" });
 
-async function create() {
-  await createTeacher(form.value);
-  showAdd.value = false;
-  form.value = { name: "", email: "", password: "", subject: "" };
+function openAddModal() { showAdd.value = true; }
+function closeAdd() { showAdd.value = false; }
+
+async function onCreate() {
+  submitting.value = true;
+  try {
+    await createTeacher(form.value);
+    closeAdd();
+  } finally {
+    submitting.value = false;
+  }
 }
 
-/* DELETE */
-const showDelete = ref(false);
+// Assign grades
+const showAssign = ref(false);
+const selectedTeacher = ref<any>(null);
+const selectedGrades = ref<number[]>([]);
 
-function openDeleteModal(t: any) {
+function openAssignModal(t: any) {
   selectedTeacher.value = t;
+  selectedGrades.value = t.grades.map((g: any) => g.id);
+  showAssign.value = true;
+}
+function closeAssign() { showAssign.value = false; }
+
+async function onAssign() {
+  submitting.value = true;
+  try {
+    await assignGrades(selectedTeacher.value.id, selectedGrades.value);
+    closeAssign();
+  } finally {
+    submitting.value = false;
+  }
+}
+
+// Delete
+const showDelete = ref(false);
+const deleteTarget = ref<any>(null);
+
+function confirmDelete(t: any) {
+  deleteTarget.value = t;
   showDelete.value = true;
 }
-
-function closeDelete() {
-  selectedTeacher.value = null;
+function cancelDelete() {
+  deleteTarget.value = null;
   showDelete.value = false;
 }
 
-async function confirmDelete() {
-  if (!selectedTeacher.value) return;
-  await deleteTeacher(selectedTeacher.value.id);
-  await fetchTeachers();
-  closeDelete();
-}
-
-/* ASSIGN */
-const showAssign = ref(false);
-const selectedGradeIds = ref<number[]>([]);
-
-function openAssignGrades(t: any) {
-  selectedTeacher.value = t;
-
-  // ✅ PRE-CHECK already assigned grades
-  selectedGradeIds.value = t.grades
-    ? t.grades.map((g: any) => g.id)
-    : [];
-
-  showAssign.value = true;
-  fetchAllGrades();
-}
-
-
-function closeAssign() {
-  selectedTeacher.value = null;
-  selectedGradeIds.value = [];
-  showAssign.value = false;
-}
-
-async function submitAssign() {
-  if (!selectedTeacher.value) return;
-
-  if (!selectedGradeIds.value.length) {
-    alert("Please select at least one grade.");
-    return;
+async function onDelete() {
+  submitting.value = true;
+  try {
+    await removeTeacher(deleteTarget.value.id);
+    cancelDelete();
+  } finally {
+    submitting.value = false;
   }
-
-  await assignToTeacher(selectedTeacher.value.id, selectedGradeIds.value);
-  closeAssign();
 }
-
-
-
-onMounted(fetchTeachers);
 </script>
-
-<style scoped>
-.input {
-  width: 100%;
-  border: 1px solid #e5e7eb;
-  padding: 0.5rem;
-  border-radius: 0.375rem;
-  margin-bottom: 0.5rem;
-}
-</style>
