@@ -125,8 +125,9 @@ const allMenuGroups = [
         name: "Teacher",
         subItems: [
           { name: "Dashboard", path: "/teacher/dashboard", pro: false },
-          { name: "My Classes", path: "/teacher/classes", pro: false },
-          { name: "Assignments", path: "/teacher/assignments", pro: false },
+          { name: "Ratings", path: "/teacher/ratings", pro: false },
+          { name: "Rewards", path: "/teacher/rewards", pro: false },
+          { name: "Withdrawal", path: "/teacher/withdrawals", pro: false },
         ]
       }
     ]
