@@ -14,7 +14,18 @@ const router = createRouter({
     // --------------------
     {
       path: '/',
-      redirect: '/signin',
+      component: () => import('../views/ParentLanding.vue'),
+      meta: { title: 'Landing Page' },
+    },
+    {
+      path: '/reward-teacher',
+      component: () => import('../views/RewardTeacher.vue'),
+      meta: { title: 'Teacher Rewarding' },
+    },
+    {
+      path: '/rate-teacher',
+      component: () => import('../views/RateTeacher.vue'),
+      meta: { title: 'Teacher Rating' },
     },
     {
       path: '/calendar',
