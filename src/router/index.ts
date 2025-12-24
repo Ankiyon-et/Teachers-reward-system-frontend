@@ -14,13 +14,11 @@ const router = createRouter({
     // --------------------
     {
       path: '/',
-      name: 'Ecommerce',
-      component: () => import('../views/Ecommerce.vue'),
-      meta: { title: 'eCommerce Dashboard' },
+      redirect: '/signin',
     },
     {
       path: '/calendar',
-      component: () => import('../views/Others/Calendar.vue'),
+      component: () => import('../views/Tables/BasicTables.vue'),
       meta: { title: 'Calendar' },
     },
     {
@@ -58,10 +56,16 @@ const router = createRouter({
       meta: { role: 1, title: 'Super Admins' },
     },
     {
-      path: '/super-admin/profile',
-      component: () => import('../views/super-admin/Profile.vue'),
-      meta: { role: 1, title: 'Profile' },
+      path: '/super-admin/schools/:id',
+      name: 'SuperAdminSchoolDetail',
+      component: () => import('../views/super-admin/SchoolDetail.vue'),
     },
+    {
+      path: '/super-admin/grades',
+      component: () => import('../views/super-admin/Grades.vue'),
+      meta: { role: 1, title: 'Grades' },
+    },
+
 
     // --------------------
     // School Admin (role = 2)
@@ -80,16 +84,6 @@ const router = createRouter({
       path: '/school-admin/grades',
       component: () => import('../views/school-admin/Grades.vue'),
       meta: { role: 2, title: 'Grades' },
-    },
-    {
-      path: '/school-admin/reports',
-      component: () => import('../views/school-admin/Reports.vue'),
-      meta: { role: 2, title: 'Reports' },
-    },
-    {
-      path: '/school-admin/profile',
-      component: () => import('../views/school-admin/Profile.vue'),
-      meta: { role: 2, title: 'Profile' },
     },
 
     // --------------------
@@ -115,11 +109,7 @@ const router = createRouter({
       component: () => import('../views/teacher/Withdrawals.vue'),
       meta: { role: 3, title: 'Withdrawals' },
     },
-    {
-      path: '/teacher/profile',
-      component: () => import('../views/teacher/Profile.vue'),
-      meta: { role: 3, title: 'Profile' },
-    },
+
 
     // --------------------
     // Errors
