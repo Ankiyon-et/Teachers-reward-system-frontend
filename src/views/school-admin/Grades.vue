@@ -4,7 +4,7 @@
 
       <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl font-semibold text-gray-800 dark:text-white/90">Manage Grades</h1>
-        <Button variant="primary" size="md" @click="openAssignModal">+ Assign Grades</Button>
+        <Button variant="primary" size="md" @click="openAssignModal">+ Add Grades</Button>
         <Button variant="outline" size="sm" @click="refresh">Refresh</Button>
       </div>
 

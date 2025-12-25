@@ -20,11 +20,6 @@
               {{ dashboard.total_teachers }}
             </h3>
           </div>
-          <div
-            class="flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400"
-          >
-            👩‍🏫
-          </div>
         </div>
       </ComponentCard>
 
@@ -39,11 +34,6 @@
               {{ formatCurrency(dashboard.total_rewards_received) }}
             </h3>
           </div>
-          <div
-            class="flex h-12 w-12 items-center justify-center rounded-full bg-success-100 text-success-600 dark:bg-success-500/10 dark:text-success-400"
-          >
-            💰
-          </div>
         </div>
       </ComponentCard>
 
@@ -57,11 +47,6 @@
             <h3 class="mt-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
               {{ dashboard.average_school_rating }}
             </h3>
-          </div>
-          <div
-            class="flex h-12 w-12 items-center justify-center rounded-full bg-warning-100 text-warning-600 dark:bg-warning-500/10 dark:text-warning-400"
-          >
-            ⭐
           </div>
         </div>
       </ComponentCard>

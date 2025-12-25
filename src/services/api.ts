@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: "https://sms.henokfikadu.com/api",
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
@@ -14,3 +14,5 @@ api.interceptors.request.use((config) => {
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
+
+

@@ -7,8 +7,6 @@ export const schoolAdminMenu = [
       { name: "Dashboard", path: "/school-admin/dashboard", icon: GridIcon },
       { name: "Teachers", path: "/school-admin/teachers", icon: UserCircleIcon },
       { name: "Grades", path: "/school-admin/grades", icon: TableIcon },
-      { name: "Reports", path: "/school-admin/reports", icon: ListIcon },
-      { name: "Profile", path: "/school-admin/profile", icon: UserCircleIcon },
     ],
   },
 ];

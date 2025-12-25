@@ -8,7 +8,6 @@ export const teacherMenu = [
       { name: "Ratings", path: "/teacher/ratings", icon: ListIcon },
       { name: "Rewards", path: "/teacher/rewards", icon: ListIcon },
       { name: "Withdrawals", path: "/teacher/withdrawals", icon: ListIcon },
-      { name: "Profile", path: "/teacher/profile", icon: UserCircleIcon },
     ],
   },
 ];
