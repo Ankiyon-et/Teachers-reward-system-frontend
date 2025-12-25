@@ -123,7 +123,7 @@ const signOut = () => {
   // userToken.value = null
   localStorage.removeItem('token')
   closeDropdown()
-  router.replace('/signin')
+  router.replace('/')
 }
 
 /* Click outside */
