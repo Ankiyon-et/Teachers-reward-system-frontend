@@ -1,120 +1,161 @@
 <template>
   <FullScreenLayout>
-    <div class="min-h-screen flex items-center justify-center px-4">
-
+    <div
+      class="min-h-screen flex items-center justify-center
+             bg-gray-50 dark:bg-gray-950 px-4"
+    >
       <div
-        class="w-full max-w-md p-6 rounded-xl
-               bg-white border border-gray-200
-               dark:bg-gray-900 dark:border-gray-800"
+        class="w-full max-w-md space-y-6
+               bg-white dark:bg-gray-900
+               border border-gray-200 dark:border-gray-800
+               rounded-xl p-6"
       >
-        <h1 class="text-2xl font-semibold mb-6 text-gray-800 dark:text-white">
+        <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">
           Rate a Teacher
-        </h1>
+        </h2>
 
-        <!-- Success Message -->
-        <div
-          v-if="success"
-          class="mb-4 p-3 rounded-md
-                 bg-green-50 text-green-700
-                 dark:bg-green-900/30 dark:text-green-400"
-        >
-          Thank you for your feedback!
+        <!-- School -->
+        <div class="space-y-1">
+          <label class="label">School</label>
+          <select v-model="selectedSchoolId" class="input">
+            <option disabled value="">Select school</option>
+            <option v-for="s in schools" :key="s.id" :value="s.id">
+              {{ s.name }}
+            </option>
+          </select>
         </div>
 
-        <!-- Error Message -->
-        <div
-          v-if="error"
-          class="mb-4 p-3 rounded-md
-                 bg-red-50 text-red-700
-                 dark:bg-red-900/30 dark:text-red-400"
-        >
-          {{ error }}
+        <!-- Grade -->
+        <div v-if="grades.length" class="space-y-1">
+          <label class="label">Grade</label>
+          <select v-model="selectedGradeId" class="input">
+            <option disabled value="">Select grade</option>
+            <option v-for="g in grades" :key="g.id" :value="g.id">
+              {{ g.name }}
+            </option>
+          </select>
         </div>
 
-        <form @submit.prevent="handleSubmit" class="space-y-4">
+        <!-- Teacher -->
+        <div v-if="teachers.length" class="space-y-1">
+          <label class="label">Teacher</label>
+          <select v-model="selectedTeacher" class="input">
+            <option disabled value="">Select teacher</option>
+            <option v-for="t in teachers" :key="t.id" :value="t">
+              {{ t.user.name }} — ⭐ {{ t.average_rating }}
+            </option>
+          </select>
+        </div>
 
-          <!-- Teacher ID (placeholder for now) -->
-          <div>
-            <label class="block mb-1 text-sm text-gray-600 dark:text-gray-400">
-              Teacher ID
-            </label>
-            <input
-              v-model.number="form.teacher_id"
-              type="number"
-              required
-              class="w-full px-3 py-2 rounded-md border
-                     bg-white text-gray-800
-                     dark:bg-gray-800 dark:text-white
-                     dark:border-gray-700"
-            />
-          </div>
+        <!-- Star Rating -->
+        <div class="space-y-1">
+          <label class="label">Rating</label>
 
-          <!-- Rating -->
-          <div>
-            <label class="block mb-1 text-sm text-gray-600 dark:text-gray-400">
-              Rating (1–5)
-            </label>
-            <select
-              v-model.number="form.value"
-              required
-              class="w-full px-3 py-2 rounded-md border
-                     bg-white text-gray-800
-                     dark:bg-gray-800 dark:text-white
-                     dark:border-gray-700"
+          <div class="flex gap-2">
+            <button
+              v-for="star in 5"
+              :key="star"
+              type="button"
+              @click="rating = star"
+              class="text-3xl transition"
+              :class="
+                star <= rating
+                  ? 'text-yellow-400'
+                  : 'text-gray-300 dark:text-gray-600'
+              "
             >
-              <option disabled value="">Select rating</option>
-              <option v-for="n in 5" :key="n" :value="n">
-                {{ n }}
-              </option>
-            </select>
+              ★
+            </button>
           </div>
+        </div>
 
-          <!-- Comment -->
-          <div>
-            <label class="block mb-1 text-sm text-gray-600 dark:text-gray-400">
-              Comment (optional)
-            </label>
-            <textarea
-              v-model="form.comment"
-              rows="3"
-              class="w-full px-3 py-2 rounded-md border
-                     bg-white text-gray-800
-                     dark:bg-gray-800 dark:text-white
-                     dark:border-gray-700"
-            />
-          </div>
+        <!-- Comment -->
+        <div class="space-y-1">
+          <label class="label">Comment (optional)</label>
+          <textarea
+            v-model="comment"
+            rows="3"
+            class="input resize-none"
+            placeholder="Write your feedback..."
+          />
+        </div>
 
-          <!-- Submit -->
-          <Button
-            type="submit"
-            class="w-full"
-            :loading="loading"
-          >
-            Submit Rating
-          </Button>
-
-        </form>
+        <!-- Submit -->
+        <Button
+          variant="primary"
+          class="w-full"
+          :disabled="!selectedTeacher"
+          @click="submitRating"
+        >
+          Submit Rating
+        </Button>
       </div>
-
     </div>
   </FullScreenLayout>
 </template>
 
 <script setup lang="ts">
-import { reactive } from "vue";
+import { ref, onMounted } from "vue";
 import FullScreenLayout from "@/components/layout/FullScreenLayout.vue";
 import Button from "@/components/ui/Button.vue";
-import { useParentRating } from "@/composables/useParentRating";
+import { usePublicTeacherSelection } from "@/composables/usePublicTeacherSelection";
+import { api } from "@/services/api";
 
-const { submitRating, loading, error, success } = useParentRating();
+const {
+  schools,
+  grades,
+  teachers,
+  selectedSchoolId,
+  selectedGradeId,
+  selectedTeacher,
+  fetchSchools,
+} = usePublicTeacherSelection();
 
-const form = reactive({
-  teacher_id: 1, // placeholder for now
-  value: 5,
-  comment: "",
-});
+const rating = ref(5);
+const comment = ref("");
 
-async function handleSubmit() {
-  await submitRating(form);
+onMounted(fetchSchools);
+
+async function submitRating() {
+  if (!selectedTeacher.value) return;
+
+  await api.post("/rate", {
+    teacher_id: selectedTeacher.value.id,
+    value: rating.value,
+    comment: comment.value,
+  });
+
+  alert("Rating submitted successfully 🎉");
+
+  // reset
+  rating.value = 5;
+  comment.value = "";
 }
 </script>
+
+<style scoped>
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(55 65 81);
+}
+
+.dark .label {
+  color: rgb(209 213 219);
+}
+
+.input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(209 213 219);
+  padding: 0.5rem 0.75rem;
+  background: white;
+  color: rgb(17 24 39);
+}
+
+.dark .input {
+  background: rgb(17 24 39);
+  border-color: rgb(55 65 81);
+  color: white;
+}
+</style>

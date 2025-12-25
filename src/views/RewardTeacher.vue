@@ -1,91 +1,137 @@
 <template>
   <FullScreenLayout>
-    <div class="min-h-screen flex flex-col items-center justify-center px-6">
-
+    <div
+      class="min-h-screen flex items-center justify-center
+             bg-gray-50 dark:bg-gray-950 px-4"
+    >
       <div
-        class="w-full max-w-md p-6 rounded-xl border
-               border-gray-200 bg-white
-               dark:border-gray-800 dark:bg-gray-900"
+        class="w-full max-w-md space-y-6
+               bg-white dark:bg-gray-900
+               border border-gray-200 dark:border-gray-800
+               rounded-xl p-6"
       >
-        <h2 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-white">
+        <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">
           Reward a Teacher
         </h2>
 
-        <p class="text-sm mb-6 text-gray-600 dark:text-gray-400">
-          Support a teacher by sending a financial reward.
-        </p>
+        <!-- School -->
+        <div class="space-y-1">
+          <label class="label">School</label>
+          <select v-model="selectedSchoolId" class="input">
+            <option disabled value="">Select school</option>
+            <option v-for="s in schools" :key="s.id" :value="s.id">
+              {{ s.name }}
+            </option>
+          </select>
+        </div>
 
-        <form @submit.prevent="onSubmit" class="space-y-4">
-          <input
-            v-model.number="teacherId"
-            type="number"
-            placeholder="Teacher ID"
-            class="input"
-            required
-          />
+        <!-- Grade -->
+        <div v-if="grades.length" class="space-y-1">
+          <label class="label">Grade</label>
+          <select v-model="selectedGradeId" class="input">
+            <option disabled value="">Select grade</option>
+            <option v-for="g in grades" :key="g.id" :value="g.id">
+              {{ g.name }}
+            </option>
+          </select>
+        </div>
 
+        <!-- Teacher -->
+        <div v-if="teachers.length" class="space-y-1">
+          <label class="label">Teacher</label>
+          <select v-model="selectedTeacher" class="input">
+            <option disabled value="">Select teacher</option>
+            <option v-for="t in teachers" :key="t.id" :value="t">
+              {{ t.user.name }} — ⭐ {{ t.average_rating }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Amount -->
+        <div class="space-y-1">
+          <label class="label">Reward Amount</label>
           <input
-            v-model.number="amount"
             type="number"
             min="1"
-            placeholder="Amount"
+            v-model.number="amount"
             class="input"
-            required
+            placeholder="Enter amount"
           />
+        </div>
 
-          <div v-if="error" class="text-sm text-red-600">
-            {{ error }}
-          </div>
-
-          <div v-if="success" class="text-sm text-green-600">
-            Reward sent successfully 🎉
-          </div>
-
-          <Button
-            variant="primary"
-            size="md"
-            class="w-full"
-            :disabled="loading"
-          >
-            {{ loading ? "Sending..." : "Send Reward" }}
-          </Button>
-        </form>
+        <!-- Submit -->
+        <Button
+          variant="primary"
+          class="w-full"
+          :disabled="!selectedTeacher || amount <= 0"
+          @click="submitReward"
+        >
+          Send Reward
+        </Button>
       </div>
-
     </div>
   </FullScreenLayout>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import FullScreenLayout from "@/components/layout/FullScreenLayout.vue";
 import Button from "@/components/ui/Button.vue";
-import { useRewards } from "@/composables/useRewards";
+import { usePublicTeacherSelection } from "@/composables/usePublicTeacherSelection";
+import { api } from "@/services/api";
 
-const teacherId = ref<number | null>(null);
-const amount = ref<number | null>(null);
+const {
+  schools,
+  grades,
+  teachers,
+  selectedSchoolId,
+  selectedGradeId,
+  selectedTeacher,
+  fetchSchools,
+} = usePublicTeacherSelection();
 
-const { loading, error, success, sendReward } = useRewards();
+const amount = ref<number>(0);
 
-async function onSubmit() {
-  if (!teacherId.value || !amount.value) return;
-  await sendReward(teacherId.value, amount.value);
+onMounted(fetchSchools);
+
+async function submitReward() {
+  if (!selectedTeacher.value || amount.value <= 0) return;
+
+  await api.post("/reward", {
+    teacher_id: selectedTeacher.value.id,
+    amount: amount.value,
+  });
+
+  alert("Reward sent successfully 🎉");
+
+  // reset
+  amount.value = 0;
 }
 </script>
 
 <style scoped>
-.input {
-  width: 100%;
-  padding: 0.6rem;
-  border-radius: 0.4rem;
-  border: 1px solid #e5e7eb;
-  background: white;
-  color: #111827;
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgb(55 65 81);
 }
 
-:global(.dark) .input {
-  background: #111827;
-  border-color: #374151;
-  color: #f9fafb;
+.dark .label {
+  color: rgb(209 213 219);
+}
+
+.input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(209 213 219);
+  padding: 0.5rem 0.75rem;
+  background: white;
+  color: rgb(17 24 39);
+}
+
+.dark .input {
+  background: rgb(17 24 39);
+  border-color: rgb(55 65 81);
+  color: white;
 }
 </style>

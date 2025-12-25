@@ -40,6 +40,14 @@
               <textarea v-model="description"
                         class="w-full rounded border px-3 py-2 dark:bg-gray-800 dark:text-white"></textarea>
             </div>
+
+            <!-- ✅ NEW FIELD: SCHOOL LOGO -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-400">School Logo</label>
+              <input type="file" accept="image/*"
+                     @change="logo = $event.target.files[0]"
+                     class="w-full rounded border px-3 py-2 dark:bg-gray-800 dark:text-white"/>
+            </div>
           </div>
 
           <!-- RIGHT COLUMN: ADMIN INFO -->
@@ -98,6 +106,8 @@ const school_name = ref('')
 const address = ref('')
 const contact_email = ref('')
 const description = ref('')
+const logo = ref(null) // ✅ added
+
 const admin_name = ref('')
 const admin_email = ref('')
 const admin_password = ref('')
@@ -109,6 +119,7 @@ const submit = () => {
     address: address.value,
     contact_email: contact_email.value,
     description: description.value,
+    logo: logo.value, // ✅ included in payload
     admin_name: admin_name.value,
     admin_email: admin_email.value,
     admin_password: admin_password.value,
