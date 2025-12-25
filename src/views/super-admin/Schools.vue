@@ -409,10 +409,16 @@ function resetForm() {
 async function onLogoSelected(e: Event) {
   const input = e.target as HTMLInputElement;
   if (!input.files?.length) return;
+
   const file = input.files[0];
-  form.value.logoPreview = await fileToDataUrl(file);
-  form.value.logo = form.value.logoPreview;
+
+  // Save file for upload
+  form.value.logo = file as any;
+
+  // Preview only
+  form.value.logoPreview = URL.createObjectURL(file);
 }
+
 
 async function onCreate() {
   submitting.value = true;
@@ -424,16 +430,16 @@ async function onCreate() {
     }
 
     const payload = {
-      school_name: form.value.school_name,
-      address: form.value.address,
-      contact_email: form.value.contact_email,
-      description: form.value.description,
-      logo: form.value.logo, // base64 or null
-      admin_name: form.value.admin_name,
-      admin_email: form.value.admin_email,
-      admin_password: form.value.admin_password,
-      admin_title: form.value.admin_title,
-    };
+  school_name: form.value.school_name,
+  address: form.value.address,
+  contact_email: form.value.contact_email,
+  description: form.value.description,
+  logo: form.value.logo, // <-- FILE now
+  admin_name: form.value.admin_name,
+  admin_email: form.value.admin_email,
+  admin_password: form.value.admin_password,
+  admin_title: form.value.admin_title,
+};
 
     const res = await createSchool(payload);
     // optionally show message
@@ -478,10 +484,13 @@ function closeEdit() {
 async function onEditLogoSelected(e: Event) {
   const input = e.target as HTMLInputElement;
   if (!input.files?.length) return;
+
   const file = input.files[0];
-  editForm.value.logoPreview = await fileToDataUrl(file);
-  editForm.value.logo = editForm.value.logoPreview;
+
+  editForm.value.logo = file as any;
+  editForm.value.logoPreview = URL.createObjectURL(file);
 }
+
 
 async function onUpdate() {
   if (!editForm.value.id) return;

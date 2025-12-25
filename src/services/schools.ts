@@ -44,15 +44,38 @@ export async function getSchool(id: number | string) {
 }
 
 export async function createSchool(payload: CreateSchoolPayload) {
-  // backend expects keys like school_name, admin_name, etc.
-  const res = await api.post("/schools", payload);
+  const formData = new FormData();
+
+  Object.entries(payload).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      formData.append(key, value as any);
+    }
+  });
+
+  const res = await api.post("/schools", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
   return res.data;
 }
 
+
 export async function updateSchool(id: number | string, payload: UpdateSchoolPayload) {
-  const res = await api.put(`/schools/${id}`, payload);
+  const formData = new FormData();
+
+  Object.entries(payload).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      formData.append(key, value as any);
+    }
+  });
+
+  const res = await api.post(`/schools/${id}?_method=PUT`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
   return res.data;
 }
+
 
 export async function deleteSchool(id: number | string) {
   const res = await api.delete(`/schools/${id}`);
