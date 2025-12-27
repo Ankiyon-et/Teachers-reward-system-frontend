@@ -84,10 +84,20 @@
                       <div class="flex items-center gap-3">
                         <div class="w-10 h-10 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                           <img
-                            v-if="s.logo"
-                            :src="s.logo"
-                            class="object-cover w-full h-full"
-                          />
+  v-if="s.logo"
+  :src="storageUrl(s.logo)"
+  class="h-12 w-12 object-contain"
+/>
+<div
+  class="flex items-center justify-center
+         h-10 w-10 rounded-full
+         bg-gray-200 text-gray-700
+         dark:bg-gray-800 dark:text-gray-200"
+>
+  <span class="text-xs font-semibold">
+    {{ s.name?.charAt(0) }}
+  </span>
+</div>
                         </div>
                         <div>
                           <span class="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
@@ -312,6 +322,7 @@ import { useRouter } from "vue-router";
 import { useSchools } from "@/composables/useSchools";
 import { userToken, setUserToken, userRoleId } from "@/composables/useAuth";
 import { resolveStorageUrl } from "@/utils/files";
+import { storageUrl } from "@/utils/storage";
 
 // role guard: super admin role id is 1 (per your sidebar)
 const router = useRouter();

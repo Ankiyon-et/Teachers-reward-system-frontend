@@ -1,4 +1,9 @@
+// src/utils/files.ts
 export function resolveStorageUrl(path?: string | null) {
-  if (!path) return null;
-  return `${import.meta.env.VITE_API_BASE_URL}/storage/${path}`;
+  if (!path) return undefined;
+
+  if (path.startsWith("http")) return path;
+  if (path.startsWith("/storage")) return path;
+
+  return `/storage/${path}`;
 }
