@@ -96,6 +96,11 @@ const router = createRouter({
       component: () => import('../views/school-admin/Grades.vue'),
       meta: { role: 2, title: 'Grades' },
     },
+    {
+      path: '/school-admin/schooladmins',
+      component: () => import('../views/school-admin/SchoolAdmins.vue'),
+      meta: { role: 2, title: 'School Admins' },
+    },
 
     // --------------------
     // Teacher (role = 3)

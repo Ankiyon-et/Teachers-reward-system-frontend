@@ -311,6 +311,7 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useSchools } from "@/composables/useSchools";
 import { userToken, setUserToken, userRoleId } from "@/composables/useAuth";
+import { resolveStorageUrl } from "@/utils/files";
 
 // role guard: super admin role id is 1 (per your sidebar)
 const router = useRouter();
@@ -338,6 +339,7 @@ onMounted(() => {
     fetchSchools(); // only fetch if superadmin
   }
 });
+
 
 
 
