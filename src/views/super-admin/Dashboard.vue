@@ -1,6 +1,5 @@
 <template>
   <admin-layout>
-    <h1>hey</h1>
     <div class="grid grid-cols-12 gap-4 md:gap-6">
       <!-- Metrics -->
       <div class="col-span-12">
